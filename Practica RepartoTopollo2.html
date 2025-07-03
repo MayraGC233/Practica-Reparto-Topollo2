@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Pedidos - Logística</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-green-100 to-blue-100 p-6">
+
+  <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 space-y-6">
+    <div class="flex justify-between items-start">
+      <h1 class="text-2xl font-bold text-gray-700">📦 Registro de Pedidos Logísticos</h1>
+      <img src="./arbol-topollo.jpg" alt="Árbol de Topollo" class="w-32 h-32 object-cover rounded-lg shadow-md">
+    </div>
+
+    <!-- Encabezado Materiales -->
+    <section class="bg-green-50 p-4 rounded-lg shadow-inner">
+      <h2 class="text-xl font-bold text-green-800 mb-2">🌳 Materiales: El Topollo</h2>
+    </section>
+
+    <!-- Formulario de Registro -->
+    <form id="pedidoForm" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block font-semibold">Número de Pedido</label>
+          <input type="text" id="numPedido" class="w-full border p-2 rounded" placeholder="Ej. 00123" required>
+        </div>
+
+        <div>
+          <label class="block font-semibold">Nombre del Cliente</label>
+          <input type="text" id="cliente" class="w-full border p-2 rounded" placeholder="Ej. Empresa XYZ" required>
+        </div>
+
+        <div>
+          <label class="block font-semibold">Nombre del Vendedor</label>
+          <input type="text" id="vendedor" class="w-full border p-2 rounded" placeholder="Ej. Juan Pérez" required>
+        </div>
+
+        <div>
+          <label class="block font-semibold">Estado del Pedido</label>
+          <select id="estadoPedido" class="w-full border p-2 rounded" required>
+            <option disabled selected>Seleccionar</option>
+            <option>🕒 En espera</option>
+            <option>🚚 Cargando</option>
+            <option>✅ En reparto</option>
+            <option>📬 Entregado</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold">Nombre del Chofer</label>
+          <input type="text" id="chofer" class="w-full border p-2 rounded" placeholder="Ej. Carlos Mendoza">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Hora de Salida de Bodega</label>
+          <input type="time" id="salida" class="w-full border p-2 rounded">
+        </div>
+
+        <div>
+          <label class="block font-semibold">Hora de Entrega</label>
+          <input type="time" id="entrega" class="w-full border p-2 rounded">
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block font-semibold">Nombre de quien recibe</label>
+          <input type="text" id="recibe" class="w-full border p-2 rounded" placeholder="Ej. María López">
+        </div>
+      </div>
+
+      <div class="text-right">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Registrar Pedido
+        </button>
+      </div>
+    </form>
+
+    <!-- Tabla de Pedidos -->
+    <div class="overflow-x-auto mt-6">
+      <h2 class="text-xl font-semibold mb-2">📋 Pedidos Registrados</h2>
+      <table class="w-full table-auto border-collapse">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="p-2 border"># Pedido</th>
+            <th class="p-2 border">Cliente</th>
+            <th class="p-2 border">Vendedor</th>
+            <th class="p-2 border">Estado</th>
+            <th class="p-2 border">Chofer</th>
+            <th class="p-2 border">Salida</th>
+            <th class="p-2 border">Entrega</th>
+            <th class="p-2 border">Recibe</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPedidos">
+          <!-- Registros dinámicos -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+    const telefonosVendedores = {
+      "Mayra": "5212381048309",
+      "Juan Pérez": "5211111111111",
+      "Laura García": "5212222222222"
+    };
+
+    function renderPedidos() {
+      const tabla = document.getElementById("tablaPedidos");
+      tabla.innerHTML = "";
+      pedidos.forEach(pedido => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td class="border p-1">${pedido.numPedido}</td>
+          <td class="border p-1">${pedido.cliente}</td>
+          <td class="border p-1">${pedido.vendedor}</td>
+          <td class="border p-1">${pedido.estado}</td>
+          <td class="border p-1">${pedido.chofer}</td>
+          <td class="border p-1">${pedido.salida}</td>
+          <td class="border p-1">${pedido.entrega}</td>
+          <td class="border p-1">${pedido.recibe || 'N/A'}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+
+    document.getElementById("pedidoForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const numPedido = document.getElementById("numPedido").value.trim();
+      const cliente = document.getElementById("cliente").value.trim();
+      const vendedor = document.getElementById("vendedor").value.trim();
+      const estado = document.getElementById("estadoPedido").value;
+      const chofer = document.getElementById("chofer").value.trim();
+      const salida = document.getElementById("salida").value;
+      const entrega = document.getElementById("entrega").value;
+      const recibe = document.getElementById("recibe").value.trim();
+
+      if (recibe === "" && !(estado.includes("espera") || estado.includes("Cargando"))) {
+        alert("⚠️ No hay nombre de quien recibe. Contactando al vendedor: " + vendedor);
+
+        const telefono = telefonosVendedores[vendedor] || "5210000000000";
+        const mensaje = `Hola ${vendedor}, no hay quien reciba el pedido número ${numPedido}. ¿Cómo proceder?`;
+        const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
+        window.open(url, '_blank');
+
+        return;
+      }
+
+      const nuevoPedido = { numPedido, cliente, vendedor, estado, chofer, salida, entrega, recibe };
+      pedidos.push(nuevoPedido);
+      localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+      alert("✅ Pedido registrado exitosamente.");
+      this.reset();
+      renderPedidos();
+    });
+
+    renderPedidos();
+  </script>
+
+</body>
+</html>
